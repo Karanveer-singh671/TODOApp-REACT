@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 import './App.css';
 import Todos from './components/Todos';
 import AddTodo from './components/AddTodo';
+import About from './components/pages/About';
 import Header from './components/layout/Header';
+import uuid from 'uuid';
 class App extends Component {
 	// renders component in browser
 	// state is in App and can be passed as props to children
@@ -10,7 +13,7 @@ class App extends Component {
 	state = {
 		todos: [
 			{
-				id: 1,
+				id: uuid.v4(),
 				title: 'Finish Todo app',
 				completed: false
 			},
@@ -53,19 +56,46 @@ class App extends Component {
 			})
 		});
 	};
+	// addTodo  anonymous function expression taking in title
+	addTodo = (title) => {
+		const newTodo = {
+			id: uuid.v4(),
+			title,
+			completed: false
+		};
+		console.log(title);
+		this.setState({ todos: [ ...this.state.todos, newTodo ] });
+	};
 
 	render() {
 		return (
 			// need to use className (for class in html)
 			// this.state.todos is state from App and it is stored in todos
 			// todos can now be passed as a prop for any other component
-			<div className="App">
-				<div className="container">
-					<Header />
-					<AddTodo />
-					<Todos todos={this.state.todos} markComplete={this.markComplete} delTodo={this.delTodo} />
+			// adding 'exact' to route will only show component there else if go to about without using exact
+			// will display whatever at '/' path and  '/about'
+			<Router>
+				<div className="App">
+					<div className="container">
+						<Header />
+						<Route
+							exact
+							path="/"
+							render={(props) => (
+								<React.Fragment>
+									<AddTodo addTodo={this.addTodo} />
+									<Todos
+										todos={this.state.todos}
+										markComplete={this.markComplete}
+										delTodo={this.delTodo}
+									/>
+								</React.Fragment>
+							)}
+						/>
+						<Route path="/about" component={About} />
+					</div>
 				</div>
-			</div>
+			</Router>
 		);
 	}
 }
