@@ -6,39 +6,30 @@ import AddTodo from './components/AddTodo';
 import About from './components/pages/About';
 import Header from './components/layout/Header';
 import uuid from 'uuid';
+import axios from 'axios';
 class App extends Component {
 	// renders component in browser
 	// state is in App and can be passed as props to children
-
+	// initial request use componentDidMount lifecycle method right after component mounts
 	state = {
-		todos: [
-			{
-				id: uuid.v4(),
-				title: 'Finish Todo app',
-				completed: false
-			},
-			{
-				id: 2,
-				title: 'Finish Laundry',
-				completed: true
-			},
-			{
-				id: 3,
-				title: 'Finish Packing boxes',
-				completed: false
-			},
-			{
-				id: 4,
-				title: 'Finish signing sublet',
-				completed: false
-			}
-		]
+		todos: []
 	};
+	// axios is used to make http requests
+	componentDidMount() {
+		// adding ?_limit=Number will limit result from query
+		axios
+			.get('https://jsonplaceholder.typicode.com/todos?_limit=15')
+			.then((res) => this.setState({ todos: res.data }));
+	}
 
 	//delete todo
 	delTodo = (id) => {
 		// pass in our state object
-		this.setState({ todos: [ ...this.state.todos.filter((todo) => todo.id !== id) ] });
+		// back ticks to allow string interpolation since need id to delete
+		axios
+			.delete(`https://jsonplaceholder.typicode.com/todos/${id}`)
+			// 1 param in arrow function don't need brace only if more than 1 param
+			.then((res) => this.setState({ todos: [ ...this.state.todos.filter((todo) => todo.id !== id) ] }));
 	};
 
 	// Toggle Complete
@@ -56,15 +47,23 @@ class App extends Component {
 			})
 		});
 	};
-	// addTodo  anonymous function expression taking in title
+	// addTodo  anonymous function expression taking in title for UI
 	addTodo = (title) => {
-		const newTodo = {
-			id: uuid.v4(),
-			title,
-			completed: false
-		};
-		console.log(title);
-		this.setState({ todos: [ ...this.state.todos, newTodo ] });
+		// const newTodo = {
+		// id: uuid.v4(),
+		// title,
+		// completed: false
+		// };
+		// second param is data want to send
+		// make req to json placeholder which sends response back witht the todo info and then it's added to the UI
+		// won't set state if promise unfulfilled
+		axios
+			.post('https://jsonplaceholder.typicode.com/todos', {
+				title,
+				completed: false
+			})
+			.then((res) => this.setState({ todos: [ ...this.state.todos, res.data ] }));
+		// this.setState({ todos: [ ...this.state.todos, newTodo ] });
 	};
 
 	render() {
