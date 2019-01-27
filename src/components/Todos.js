@@ -6,13 +6,17 @@ class Todos extends Component {
 //   console.log('Hello')
 // }
 
+
+
+
   render() {
     // pass todos as a prop here and map each todo in the array to display title
     // todo(left) is a prop to be used which stores the todo in the map parameter 
     // when map generates list should have a unique key so add key and we know todo id is unique so set 
     // to that
     return this.props.todos.map((todo)=> (
-      <TodoItem key={todo.id} todo={todo} markComplete={this.props.markComplete} />
+      <TodoItem key={todo.id} todo={todo} markComplete={this.props.markComplete}
+    delTodo={this.props.delTodo}/>
     ));
   }
 }
